@@ -8,33 +8,114 @@ import time
 # 1. CONFIGURACIÓN DE PÁGINA
 st.set_page_config(page_title="Ficha Inmobiliaria | Martínez Prop", layout="wide", initial_sidebar_state="collapsed")
 
-# 2. DISEÑO CSS PROFESIONAL (ESTILO PROPIO FICHAS)
+# 2. DISEÑO CSS "DARK MODE" PROFESIONAL
 st.markdown("""
     <style>
     [data-testid="stHeader"] {display: none;}
-    body { background-color: #f7fafc; }
-    .stApp { max-width: 1200px; margin: 0 auto; background-color: white; }
     
-    /* Contenedor Ficha */
+    /* Fondo General de la App */
+    .stApp { 
+        background-color: #0f172a; 
+        color: #f1f5f9;
+    }
+    
+    /* Contenedor Principal */
     .main-container { padding: 40px; }
-    .header-prop { margin-bottom: 30px; }
-    .titulo-prop { font-size: 36px; font-weight: 800; color: #1a202c; line-height: 1.1; margin-bottom: 10px; }
-    .precio-prop { font-size: 32px; color: #2b6cb0; font-weight: 700; }
     
-    /* Grilla de Datos */
+    .titulo-prop { 
+        font-size: 36px; 
+        font-weight: 800; 
+        color: #ffffff; 
+        line-height: 1.1; 
+        margin-bottom: 10px; 
+    }
+    
+    .precio-prop { 
+        font-size: 32px; 
+        color: #38bdf8; 
+        font-weight: 700; 
+    }
+    
+    /* Grilla de Datos Técnicos en Modo Oscuro */
     .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px; margin: 30px 0; }
-    .data-card { background: #f1f5f9; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
-    .data-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 5px; display: block; }
-    .data-value { font-size: 18px; font-weight: 600; color: #1e293b; }
+    
+    .data-card { 
+        background: #1e293b; 
+        padding: 20px; 
+        border-radius: 12px; 
+        text-align: center; 
+        border: 1px solid #334155; 
+    }
+    
+    .data-label { 
+        font-size: 11px; 
+        color: #94a3b8; 
+        text-transform: uppercase; 
+        font-weight: 700; 
+        margin-bottom: 5px; 
+        display: block; 
+    }
+    
+    .data-value { 
+        font-size: 18px; 
+        font-weight: 600; 
+        color: #f1f5f9; 
+    }
 
     /* Descripción */
-    .section-title { font-size: 22px; font-weight: 700; color: #1e293b; margin-top: 40px; padding-bottom: 10px; border-bottom: 2px solid #edf2f7; margin-bottom: 20px; }
-    .description-text { font-size: 17px; line-height: 1.8; color: #4a5568; white-space: pre-wrap; }
+    .section-title { 
+        font-size: 22px; 
+        font-weight: 700; 
+        color: #ffffff; 
+        margin-top: 40px; 
+        padding-bottom: 10px; 
+        border-bottom: 2px solid #334155; 
+        margin-bottom: 20px; 
+    }
+    
+    .description-text { 
+        font-size: 17px; 
+        line-height: 1.8; 
+        color: #cbd5e1; 
+        white-space: pre-wrap; 
+    }
 
     /* Card de Contacto Lateral */
-    .contact-sidebar { background: white; border: 1px solid #e2e8f0; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); position: sticky; top: 40px; }
-    .wa-button { background-color: #25d366; color: white !important; padding: 16px; border-radius: 10px; text-decoration: none; display: block; text-align: center; font-weight: 700; font-size: 16px; margin-top: 20px; transition: 0.3s; }
-    .wa-button:hover { background-color: #128c7e; transform: translateY(-2px); }
+    .contact-sidebar { 
+        background: #1e293b; 
+        border: 1px solid #334155; 
+        padding: 30px; 
+        border-radius: 16px; 
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); 
+        position: sticky; 
+        top: 40px; 
+    }
+    
+    .wa-button { 
+        background-color: #22c55e; 
+        color: white !important; 
+        padding: 16px; 
+        border-radius: 10px; 
+        text-decoration: none; 
+        display: block; 
+        text-align: center; 
+        font-weight: 700; 
+        font-size: 16px; 
+        margin-top: 20px; 
+        transition: 0.3s; 
+    }
+    
+    .wa-button:hover { 
+        background-color: #16a34a; 
+        transform: translateY(-2px); 
+    }
+
+    /* Estilo de los inputs en el panel de control */
+    input, textarea {
+        background-color: #1e293b !important;
+        color: white !important;
+        border: 1px solid #334155 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -55,7 +136,6 @@ def extraer_datos_profesionales(url):
             d["titulo"] = soup.find('h1', class_='titlebar__title').text.strip() if soup.find('h1') else "Propiedad Martínez Prop"
             d["precio"] = soup.find('p', class_='titlebar__price').text.strip() if soup.find('p', class_='titlebar__price') else "Consultar"
             
-            # Características técnicas
             for item in soup.find_all('li', class_='property-main-features-item'):
                 val = item.find('strong').text.strip()
                 lbl = item.find('p').text.lower()
@@ -79,7 +159,6 @@ def extraer_datos_profesionales(url):
 # --- NAVEGACIÓN ---
 params = st.query_params
 if "view" in params:
-    # VISTA CLIENTE
     d = st.session_state.get('p_data', {})
     a = st.session_state.get('a_data', {"nombre": "Virginia Lincuiz", "wa": "5492213184015"})
     
@@ -110,11 +189,11 @@ if "view" in params:
     with col_sidebar:
         st.markdown(f"""
             <div class='contact-sidebar'>
-                <p style='color:#2b6cb0; font-weight:800; font-size:12px; text-transform:uppercase;'>Contacto Agente</p>
-                <h3 style='margin-bottom:5px;'>{a['nombre']}</h3>
-                <p style='color:#718096; font-size:14px;'>Martínez Propiedades</p>
-                <hr style='border:0; border-top:1px solid #edf2f7; margin:20px 0;'>
-                <p style='font-size:15px;'>Hacé clic para coordinar una visita o recibir más información de esta unidad.</p>
+                <p style='color:#38bdf8; font-weight:800; font-size:12px; text-transform:uppercase;'>Contacto Agente</p>
+                <h3 style='margin-bottom:5px; color:white;'>{a['nombre']}</h3>
+                <p style='color:#94a3b8; font-size:14px;'>Martínez Propiedades</p>
+                <hr style='border:0; border-top:1px solid #334155; margin:20px 0;'>
+                <p style='font-size:15px; color:#cbd5e1;'>Hacé clic para coordinar una visita o recibir más información.</p>
                 <a href="https://wa.me/{a['wa']}?text=Hola%20{a['nombre']},%20consulto%20por:%20{d['titulo']}" class="wa-button">SOLICITAR INFORMACIÓN</a>
             </div>
         """, unsafe_allow_html=True)
@@ -122,13 +201,12 @@ if "view" in params:
             st.query_params.clear()
             st.rerun()
 else:
-    # PANEL CONTROL
-    st.title("🏠 Generador Martínez Prop")
+    st.title("🏠 Martínez Prop | Generador")
     nom = st.text_input("Tu Nombre", "Virginia Lincuiz")
     cel = st.text_input("Tu WhatsApp", "5492213184015")
     url = st.text_input("Link de Argenprop:")
     if st.button("🚀 GENERAR FICHA PROFESIONAL"):
-        with st.spinner("Infiltrando portal..."):
+        with st.spinner("Conectando con el portal..."):
             res = extraer_datos_profesionales(url)
             if res:
                 st.session_state.p_data = res
@@ -136,4 +214,4 @@ else:
                 st.query_params["view"] = "ficha"
                 st.rerun()
             else:
-                st.error("Bloqueo de seguridad detectado. Subí la app a internet para solucionar esto.")
+                st.error("Error de conexión. Intentá nuevamente.")
